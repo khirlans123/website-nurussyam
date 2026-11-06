@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <radialGradient id="gradBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#f4fbf7"/>
+      <stop offset="100%" stop-color="#e2f3ea"/>
+    </radialGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#15803D"/>
+      <stop offset="50%" stop-color="#0F5132"/>
+      <stop offset="100%" stop-color="#0B3D26"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="50%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#991B1B"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Outer Shadow Circle -->
+  <circle cx="250" cy="250" r="235" fill="none" stroke="#D97706" stroke-width="3" opacity="0.6"/>
+
+  <!-- Outer Green Ring -->
+  <circle cx="250" cy="250" r="225" fill="#0F5132" filter="url(#shadow)"/>
+
+  <!-- Inner Red Ribbon/Ring Accent -->
+  <circle cx="250" cy="250" r="185" fill="#DC2626"/>
+
+  <!-- Gold Border -->
+  <circle cx="250" cy="250" r="172" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+
+  <!-- White/Light Center Background -->
+  <circle cx="250" cy="250" r="165" fill="url(#gradBg)"/>
+
+  <!-- Islamic Pattern Rays in Center -->
+  <g opacity="0.12" stroke="#0F5132" stroke-width="1.5">
+    <line x1="250" y1="90" x2="250" y2="410"/>
+    <line x1="90" y1="250" x2="410" y2="250"/>
+    <line x1="137" y1="137" x2="363" y2="363"/>
+    <line x1="137" y1="363" x2="363" y2="137"/>
+  </g>
+
+  <!-- Circular Text Path for Upper and Lower -->
+  <path id="textPathTop" d="M 70,250 A 180,180 0 1,1 430,250" fill="none"/>
+  <path id="textPathBottom" d="M 425,250 A 175,175 0 0,1 75,250" fill="none"/>
+
+  <text fill="#FFFFFF" font-family="'Cinzel', 'Trajan Pro', 'Georgia', serif" font-size="20" font-weight="900" letter-spacing="4.5">
+    <textPath href="#textPathTop" startOffset="50%" text-anchor="middle">
+      PONDOK PESANTREN NURUSSYAM
+    </textPath>
+  </text>
+
+  <text fill="#FCD34D" font-family="'Cinzel', 'Arial', sans-serif" font-size="16" font-weight="bold" letter-spacing="3.5">
+    <textPath href="#textPathBottom" startOffset="50%" text-anchor="middle">
+      ★ BALUNG - JEMBER ★
+    </textPath>
+  </text>
+
+  <!-- Central Mosque Dome (Kubah) -->
+  <g transform="translate(0, -10)" filter="url(#shadow)">
+    <!-- Base Dome Structure -->
+    <path d="M 180,260 L 320,260 L 315,220 C 315,190 285,150 250,135 C 215,150 185,190 185,220 Z" 
+          fill="url(#greenGrad)" stroke="#F59E0B" stroke-width="3"/>
+    
+    <!-- Dome Segments / Details -->
+    <path d="M 215,258 C 215,210 235,160 250,135 C 265,160 285,210 285,258" 
+          fill="none" stroke="#FCD34D" stroke-width="2" opacity="0.75"/>
+    <line x1="250" y1="135" x2="250" y2="258" stroke="#FCD34D" stroke-width="2.5"/>
+
+    <!-- Crescent & Star Finial atop Dome -->
+    <path d="M 250,135 L 250,105" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="250" cy="100" r="12" fill="url(#goldGrad)"/>
+    <circle cx="254" cy="98" r="9.5" fill="#f4fbf7"/>
+    <!-- Small star -->
+    <polygon points="256,98 258,102 262,102 259,104 260,108 256,105 252,108 253,104 250,102 254,102" fill="#D97706"/>
+
+    <!-- Minarets / Spires on Left and Right -->
+    <rect x="168" y="200" width="12" height="60" rx="3" fill="#0F5132" stroke="#FCD34D" stroke-width="1.5"/>
+    <path d="M 166,200 L 174,180 L 182,200 Z" fill="url(#goldGrad)"/>
+    <rect x="320" y="200" width="12" height="60" rx="3" fill="#0F5132" stroke="#FCD34D" stroke-width="1.5"/>
+    <path d="M 318,200 L 326,180 L 334,200 Z" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- Open Book (Kitab Suci / Kitab Kuning) -->
+  <g transform="translate(250, 290)" filter="url(#shadow)">
+    <!-- Book Backing / Rehal Stand -->
+    <polygon points="-50,60 0,35 50,60 40,75 -40,75" fill="#78350F" stroke="#D97706" stroke-width="2"/>
+    <polygon points="-30,65 -5,45 -20,85 -40,85" fill="#92400E"/>
+    <polygon points="30,65 5,45 20,85 40,85" fill="#92400E"/>
+
+    <!-- Left Page -->
+    <path d="M 0,35 C -30,22 -65,22 -95,30 C -95,10 -65,2 0,16 Z" 
+          fill="#FFFBEB" stroke="#B45309" stroke-width="2.5"/>
+    <path d="M -5,32 C -30,20 -60,20 -90,27 L -90,29" fill="none" stroke="#D97706" stroke-width="1.5"/>
+    <!-- Kitab lines left -->
+    <line x1="-80" y1="26" x2="-20" y2="17" stroke="#0F5132" stroke-width="2" stroke-linecap="round"/>
+    <line x1="-75" y1="30" x2="-25" y2="22" stroke="#0F5132" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Right Page -->
+    <path d="M 0,35 C 30,22 65,22 95,30 C 95,10 65,2 0,16 Z" 
+          fill="#FFFBEB" stroke="#B45309" stroke-width="2.5"/>
+    <path d="M 5,32 C 30,20 60,20 90,27 L 90,29" fill="none" stroke="#D97706" stroke-width="1.5"/>
+    <!-- Kitab lines right -->
+    <line x1="20" y1="17" x2="80" y2="26" stroke="#0F5132" stroke-width="2" stroke-linecap="round"/>
+    <line x1="25" y1="22" x2="75" y2="30" stroke="#0F5132" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Book Spine Ribbons -->
+    <path d="M 0,16 L 0,42" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 0,40 Q -10,55 -5,68" stroke="#DC2626" stroke-width="2" fill="none"/>
+    <path d="M 0,40 Q 10,55 5,68" stroke="#DC2626" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Ribbon Banner at Bottom with Motto or Year -->
+  <g transform="translate(250, 375)">
+    <path d="M -90,0 L 90,0 L 105,18 L 85,25 L -85,25 L -105,18 Z" fill="#DC2626" stroke="#FCD34D" stroke-width="1.5"/>
+    <text x="0" y="16" fill="#FFFFFF" font-family="'Cinzel', 'Arial', sans-serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="2">
+      EST. 2017
+    </text>
+  </g>
+</svg>
