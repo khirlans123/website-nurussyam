@@ -137,6 +137,7 @@
                 <h3 class="widget-heading-text"><i class="fa-solid fa-bolt"></i> Berita Terkini</h3>
             </div>
             <div class="widget-content" style="padding-top:12px;">
+                @if(!empty($sidebar_news) && count($sidebar_news) > 0)
                 <div class="news-vertical-list">
                     @foreach($sidebar_news as $news)
                         <div class="news-vert-item">
@@ -152,6 +153,12 @@
                         </div>
                     @endforeach
                 </div>
+                @else
+                <div style="padding: 24px 14px; text-align: center; color: #94a3b8; font-size: 0.86rem;">
+                    <i class="fa-regular fa-folder-open" style="font-size: 1.4rem; margin-bottom: 6px; display: block; color: #cbd5e1;"></i>
+                    Belum ada berita terkini.
+                </div>
+                @endif
             </div>
         </div>
     </aside>

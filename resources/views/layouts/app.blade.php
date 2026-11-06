@@ -600,6 +600,7 @@
                     <a href="{{ route('home') }}">Beranda</a>
                     <a href="{{ route('pendaftaran') }}">Pendaftaran</a>
                     <a href="{{ route('kontak') }}">Kontak</a>
+                    <a href="{{ route('login') }}" style="display: inline-flex; align-items: center; gap: 4px; opacity: 0.85;"><i class="fa-solid fa-lock" style="font-size: 0.72rem;"></i> Login Pengelola</a>
                 </div>
                 <div class="subfooter-copyright">
                     &copy; Copyright 2026 Pondok Pesantren Nurussyam

@@ -11,6 +11,7 @@
     <div class="content-left">
 
         <!-- BARIS PERTAMA: 3 KARTU BESAR DENGAN OVERLAY (PERSIS SEPERTI BAITULARQOM.ID) -->
+        @if(!empty($featured_articles) && count($featured_articles) > 0)
         <section class="featured-fullbleed-wrapper">
             <div class="featured-three-grid">
                 @foreach($featured_articles as $article)
@@ -36,6 +37,7 @@
                 @endforeach
             </div>
         </section>
+        @endif
 
         <!-- ==================================================================
              SECTION 1: BERITA TERBARU (MATCHING SCREENSHOT 1)
@@ -55,6 +57,7 @@
                 </div>
             </div>
 
+            @if(!empty($berita_terbaru['lead']))
             <div class="mag-grid-lead-stack">
                 <!-- Lead Article (Left) -->
                 @php $lead1 = $berita_terbaru['lead']; @endphp
@@ -80,6 +83,7 @@
                 </div>
 
                 <!-- 4 Stacked Articles (Right) -->
+                @if(!empty($berita_terbaru['items']) && count($berita_terbaru['items']) > 0)
                 <div class="mag-list-stack">
                     @foreach($berita_terbaru['items'] as $item)
                         <a href="{{ route('article.show', $item['slug']) }}" class="mag-list-item">
@@ -93,7 +97,17 @@
                         </a>
                     @endforeach
                 </div>
+                @endif
             </div>
+            @else
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 48px 20px; text-align: center; margin-top: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="width: 56px; height: 56px; margin: 0 auto 14px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 1.5rem;">
+                    <i class="fa-regular fa-newspaper"></i>
+                </div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: #334155; margin: 0 0 6px;">Belum Ada Berita</h4>
+                <p style="font-size: 0.88rem; color: #64748b; margin: 0; line-height: 1.6;">Saat ini belum ada berita atau artikel yang diterbitkan oleh pengelola.</p>
+            </div>
+            @endif
         </section>
 
         <!-- ==================================================================
@@ -161,6 +175,7 @@
              - Dark badge header + underline
              - 1 Lead post left (green title) + 4 compact items right
              ================================================================== -->
+        @if(!empty($alumni_section['lead']))
         <section class="mag-section" id="kabar-alumni">
             <div class="mag-header-bar theme-dark">
                 <a href="{{ route('page.show', 'alumni') }}" class="mag-header-badge">Kabar Alumni</a>
@@ -205,6 +220,7 @@
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- ==================================================================
              SECTION 4: LAZISWAF & DONASI (LANGSUNG DONASI & PENJELASAN PERUNTUKAN)
@@ -399,6 +415,7 @@
                 </h3>
             </div>
             <div class="widget-content" style="padding-top:12px;">
+                @if(!empty($sidebar_news) && count($sidebar_news) > 0)
                 <div class="news-vertical-list">
                     @foreach($sidebar_news as $news)
                         <div class="news-vert-item">
@@ -419,6 +436,12 @@
                         </div>
                     @endforeach
                 </div>
+                @else
+                <div style="padding: 24px 14px; text-align: center; color: #94a3b8; font-size: 0.86rem;">
+                    <i class="fa-regular fa-folder-open" style="font-size: 1.4rem; margin-bottom: 6px; display: block; color: #cbd5e1;"></i>
+                    Belum ada berita terkini.
+                </div>
+                @endif
             </div>
         </div>
 

@@ -20,172 +20,69 @@ class HomeController extends Controller
         $socialStats = $this->loadSocialStats();
         $siteSettings = $this->loadSiteSettings();
 
-        $getSafe = function ($slug) use ($articles) {
-            return $articles[$slug] ?? reset($articles);
-        };
-
         $articlesList = array_values($articles);
 
         // Section Berita Terbaru: Artikel yang baru diunggah dalam batas waktu 1 hari (<= 24 jam)
         $newUploads = array_values(array_filter($articlesList, fn($a) => !empty($a['is_new_upload'])));
 
-        // Featured Articles (Baris Atas Berita Utama - Persis Baitul Arqom):
-        // Mengambil 2 berita unggulan teratas (pada HP tampil bertingkat 2 kartu full-bleed persis baitularqom.id)
-        if (count($newUploads) >= 2) {
-            $featured_articles = array_slice($newUploads, 0, 2);
+        // Featured Articles & Berita Terbaru:
+        // Jika tidak ada berita sama sekali di database, kosongkan array murni (tanpa dummy)
+        if (empty($articlesList)) {
+            $featured_articles = [];
+            $beritaLead = null;
+            $beritaItems = [];
+            $sidebar_news = [];
         } else {
-            $featured_articles = array_slice($articlesList, 0, 2);
-        }
-        if (!empty($newUploads)) {
-            $beritaLead = $newUploads[0];
-            $otherUploads = array_values(array_filter($articlesList, fn($a) => $a['slug'] !== $beritaLead['slug']));
-            $beritaItems = array_slice($otherUploads, 0, 4);
-        } else {
-            $beritaLead = $articlesList[0] ?? $getSafe('pesantren-tempat-membentuk-generasi-berilmu-dan-berakhlak');
-            $beritaItems = count($articlesList) > 1 ? array_slice($articlesList, 1, 4) : [
-                $getSafe('panduan-memilih-pondok-pesantren-terbaik-di-bondowoso'),
-                $getSafe('pendidikan-karakter-yang-kuat-di-pondok-pesantren'),
-                $getSafe('pesan-pengasuh-pesantren-itu-kerajaan-cahaya-ilmu'),
-                $getSafe('ketika-pesantren-memberikan-ruang-imajinasi-pagelaran-seni-akbar')
-            ];
-        }
-
-        // BERITA TERKINI (Sidebar Kanan): Mengambil 5 berita terbaru secara dinamis dari database
-        $sidebar_news = array_slice($articlesList, 0, 5);
-        if (count($sidebar_news) < 4) {
-            $fallbackSlugs = [
-                'panduan-memilih-pondok-pesantren-terbaik-di-bondowoso',
-                'pesan-pengasuh-pesantren-itu-kerajaan-cahaya-ilmu',
-                'ketika-pesantren-memberikan-ruang-imajinasi-pagelaran-seni-akbar',
-                'pesantren-modern-perpaduan-antara-ilmu-agama-dan-ilmu-dunia'
-            ];
-            foreach ($fallbackSlugs as $fSlug) {
-                if (count($sidebar_news) >= 5) break;
-                $safeItem = $getSafe($fSlug);
-                if (!in_array($safeItem['slug'], array_column($sidebar_news, 'slug'))) {
-                    $sidebar_news[] = $safeItem;
-                }
+            if (count($newUploads) >= 2) {
+                $featured_articles = array_slice($newUploads, 0, 2);
+            } else {
+                $featured_articles = array_slice($articlesList, 0, 2);
             }
+
+            if (!empty($newUploads)) {
+                $beritaLead = $newUploads[0];
+                $otherUploads = array_values(array_filter($articlesList, fn($a) => $a['slug'] !== $beritaLead['slug']));
+                $beritaItems = array_slice($otherUploads, 0, 4);
+            } else {
+                $beritaLead = $articlesList[0];
+                $beritaItems = count($articlesList) > 1 ? array_slice($articlesList, 1, 4) : [];
+            }
+
+            // Sidebar Berita Terkini: 5 berita terbaru dari database
+            $sidebar_news = array_slice($articlesList, 0, 5);
         }
 
-        // Section Catatan (Format Grid Lead + Stack sama persis seperti Kabar Alumni)
+        // Section Catatan (Hanya tampil jika ada artikel yang diinput)
         $catatanMatches = array_values(array_filter($articlesList, function($a) {
             $cat = strtolower($a['base_category'] ?? $a['category'] ?? '');
             return str_contains($cat, 'catatan');
         }));
-
-        if (!empty($catatanMatches)) {
-            $catatanLead = $catatanMatches[0];
-            $catatanItems = array_slice($catatanMatches, 1, 4);
-        } else {
-            $catatanLead = $articlesList[0] ?? null;
-            $catatanItems = [];
-        }
-
-        // Jika artikel di kategori Catatan kurang dari 4, lengkapi dengan artikel lain agar layout seimbang seperti Kabar Alumni
-        if ($catatanLead) {
-            foreach ($articlesList as $extraArticle) {
-                if (count($catatanItems) >= 4) break;
-                if ($extraArticle['slug'] !== $catatanLead['slug'] && !in_array($extraArticle['slug'], array_column($catatanItems, 'slug'))) {
-                    $catatanItems[] = $extraArticle;
-                }
-            }
-        }
-
         $catatanSection = [
-            'lead' => $catatanLead,
-            'items' => $catatanItems
+            'lead' => $catatanMatches[0] ?? null,
+            'items' => array_slice($catatanMatches, 1, 4)
         ];
 
-        // Section Alumni (Dinamis jika ada artikel berkategori Alumni)
+        // Section Alumni (Hanya tampil jika ada artikel berkategori Alumni)
         $alumniMatches = array_values(array_filter($articlesList, function($a) {
             $cat = strtolower($a['base_category'] ?? $a['category'] ?? '');
             return str_contains($cat, 'alumni');
         }));
-        if (!empty($alumniMatches)) {
-            $alumniLead = $alumniMatches[0];
-            $alumniItems = array_slice($alumniMatches, 1, 4);
-            $defaultAlumniSlugs = [
-                'panduan-memilih-pondok-pesantren-terbaik-di-bondowoso',
-                'pendidikan-karakter-yang-kuat-di-pondok-pesantren',
-                'pesan-pengasuh-pesantren-itu-kerajaan-cahaya-ilmu',
-                'ketika-pesantren-memberikan-ruang-imajinasi-pagelaran-seni-akbar'
-            ];
-            foreach ($defaultAlumniSlugs as $dSlug) {
-                if (count($alumniItems) >= 4) break;
-                $item = $getSafe($dSlug);
-                if ($item['slug'] !== $alumniLead['slug'] && !in_array($item['slug'], array_column($alumniItems, 'slug'))) {
-                    $alumniItems[] = $item;
-                }
-            }
-            $alumniSection = [
-                'lead' => $alumniLead,
-                'items' => $alumniItems
-            ];
-        } else {
-            $alumniSection = [
-                'lead' => $getSafe('pesantren-tempat-membentuk-generasi-berilmu-dan-berakhlak'),
-                'items' => [
-                    $getSafe('panduan-memilih-pondok-pesantren-terbaik-di-bondowoso'),
-                    $getSafe('pendidikan-karakter-yang-kuat-di-pondok-pesantren'),
-                    $getSafe('pesan-pengasuh-pesantren-itu-kerajaan-cahaya-ilmu'),
-                    $getSafe('ketika-pesantren-memberikan-ruang-imajinasi-pagelaran-seni-akbar')
-                ]
-            ];
-        }
+        $alumniSection = [
+            'lead' => $alumniMatches[0] ?? null,
+            'items' => array_slice($alumniMatches, 1, 4)
+        ];
 
-        // Section Laziswaf (Dinamis jika ada artikel Laziswaf/Zakat/Wakaf)
-        $laziswafMatches = array_values(array_filter($articlesList, function ($a) {
-            $c = strtolower($a['base_category'] ?? $a['category'] ?? '');
-            return str_contains($c, 'laziswaf') || str_contains($c, 'zakat') || str_contains($c, 'wakaf') || str_contains($c, 'donasi');
-        }));
-        if (!empty($laziswafMatches)) {
-            $laziswafLead = $laziswafMatches[0];
-            $laziswafItems = array_slice($laziswafMatches, 1, 4);
-            $defaultLaziswafSlugs = [
-                'zakat-menyempurnakan-ramadhan-dengan-berbagi',
-                'dari-pesantren-untuk-umat-spirit-berbagi-melalui-zakat',
-                'dari-masjid-pesantren-bergerak-nurussyam-bondowoso',
-                'hidupilah-pondok-tapi-jangan-gantungkan-hidup-pada-pondok'
-            ];
-            foreach ($defaultLaziswafSlugs as $dSlug) {
-                if (count($laziswafItems) >= 4) break;
-                $item = $getSafe($dSlug);
-                if ($item['slug'] !== $laziswafLead['slug'] && !in_array($item['slug'], array_column($laziswafItems, 'slug'))) {
-                    $laziswafItems[] = $item;
-                }
-            }
-            $laziswafSection = [
-                'lead' => $laziswafLead,
-                'items' => $laziswafItems,
-                'donasi' => [
-                    'bank_mandiri' => $siteSettings['bank_mandiri'] ?? '143-00-2980022-2',
-                    'an_mandiri' => $siteSettings['an_mandiri'] ?? 'YYS PONPES NURUSSYAM',
-                    'bank_bsi' => $siteSettings['bank_bsi'] ?? '7143-0029-80',
-                    'an_bsi' => $siteSettings['an_bsi'] ?? 'LAZISWAF NURUSSYAM',
-                    'wa_confirm' => $siteSettings['wa_confirm'] ?? 'https://wa.me/6281234567890?text=Assalamu%27alaikum%20Admin%20LAZISWAF%20Nurussyam,%20saya%20ingin%20konfirmasi%20donasi/zakat',
-                    'phone' => $siteSettings['phone'] ?? '+62 812-3456-7890'
-                ]
-            ];
-        } else {
-            $laziswafSection = [
-                'lead' => $getSafe('kisah-nabi-ibrahim-dan-ismail-teladan-ketaatan-dan-keikhlasan'),
-                'items' => [
-                    $getSafe('zakat-menyempurnakan-ramadhan-dengan-berbagi'),
-                    $getSafe('dari-pesantren-untuk-umat-spirit-berbagi-melalui-zakat'),
-                    $getSafe('dari-masjid-pesantren-bergerak-nurussyam-bondowoso'),
-                    $getSafe('hidupilah-pondok-tapi-jangan-gantungkan-hidup-pada-pondok')
-                ],
-                'donasi' => [
-                    'bank_mandiri' => $siteSettings['bank_mandiri'] ?? '143-00-2980022-2',
-                    'an_mandiri' => $siteSettings['an_mandiri'] ?? 'YYS PONPES NURUSSYAM',
-                    'bank_bsi' => $siteSettings['bank_bsi'] ?? '7143-0029-80',
-                    'an_bsi' => $siteSettings['an_bsi'] ?? 'LAZISWAF NURUSSYAM',
-                    'wa_confirm' => $siteSettings['wa_confirm'] ?? 'https://wa.me/6281234567890?text=Assalamu%27alaikum%20Admin%20LAZISWAF%20Nurussyam,%20saya%20ingin%20konfirmasi%20donasi/zakat',
-                    'phone' => $siteSettings['phone'] ?? '+62 812-3456-7890'
-                ]
-            ];
-        }
+        // Section Laziswaf & Donasi (Program & Rekening Resmi)
+        $laziswafSection = [
+            'donasi' => [
+                'bank_mandiri' => $siteSettings['bank_mandiri'] ?? '143-00-2980022-2',
+                'an_mandiri' => $siteSettings['an_mandiri'] ?? 'YYS PONPES NURUSSYAM',
+                'bank_bsi' => $siteSettings['bank_bsi'] ?? '7143-0029-80',
+                'an_bsi' => $siteSettings['an_bsi'] ?? 'LAZISWAF NURUSSYAM',
+                'wa_confirm' => $siteSettings['wa_confirm'] ?? 'https://wa.me/6281234567890?text=Assalamu%27alaikum%20Admin%20LAZISWAF%20Nurussyam,%20saya%20ingin%20konfirmasi%20donasi/zakat',
+                'phone' => $siteSettings['phone'] ?? '+62 812-3456-7890'
+            ]
+        ];
 
         return [
             'all_articles' => $articles,
@@ -300,11 +197,11 @@ class HomeController extends Controller
                 }
                 return $articles;
             }
+            return [];
         } catch (\Throwable $e) {
-            // graceful fallback
+            \Illuminate\Support\Facades\Log::warning('Error loading articles: ' . $e->getMessage());
+            return [];
         }
-
-        return $this->getStaticArticles();
     }
 
     /**
@@ -635,11 +532,11 @@ class HomeController extends Controller
     /**
      * Homepage
      */
-    public function index(Request $request)
+    public function index(Request $request, $category = null)
     {
         $data = $this->getData();
         $query = $request->get('q');
-        $category = $request->get('category');
+        $category = $category ?: $request->get('category');
 
         $allArticles = array_values($data['all_articles']);
 
@@ -647,16 +544,22 @@ class HomeController extends Controller
             $filtered = array_filter($allArticles, function ($item) use ($query) {
                 return stripos($item['title'], $query) !== false || stripos($item['summary'], $query) !== false;
             });
-            $data['featured_articles'] = array_slice(array_values($filtered), 0, 3);
+            $filteredList = array_values($filtered);
+            $data['featured_articles'] = array_slice($filteredList, 0, 3);
+            $data['berita_terbaru']['lead'] = $filteredList[0] ?? null;
+            $data['berita_terbaru']['items'] = array_slice($filteredList, 1, 4);
             $data['search_query'] = $query;
         }
 
         if ($category) {
             $categoryUpper = strtoupper($category);
             $filtered = array_filter($allArticles, function ($item) use ($categoryUpper) {
-                return strtoupper($item['category']) === $categoryUpper;
+                return strtoupper($item['category']) === $categoryUpper || strtoupper($item['base_category'] ?? '') === $categoryUpper;
             });
-            $data['featured_articles'] = array_slice(array_values($filtered), 0, 3);
+            $filteredList = array_values($filtered);
+            $data['featured_articles'] = array_slice($filteredList, 0, 3);
+            $data['berita_terbaru']['lead'] = $filteredList[0] ?? null;
+            $data['berita_terbaru']['items'] = array_slice($filteredList, 1, 4);
             $data['active_category'] = $categoryUpper;
         }
 
